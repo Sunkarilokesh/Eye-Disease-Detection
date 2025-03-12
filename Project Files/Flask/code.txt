@@ -1,0 +1,86 @@
+from google.colab import files
+
+uploaded = files.upload()
+for fn in uploaded.keys():
+    print('User uploaded file "{name}" with length {length} bytes'.format(
+        name=fn, length=len(uploaded[fn])))                                                                                                      !kaggle datasets download -d gunavenkatdoddi/eye-diseases-classification                               !pip install split-folders                                                                                                                        import splitfolders
+
+input_folder = '/content/eye_diseases_data/dataset'  # Path to your dataset
+output_folder = '/content/output'
+
+# Split the dataset into training, validation, and test sets (80%, 10%, 10%)
+splitfolders.ratio(input_folder, output=output_folder, seed=1337, ratio=(0.8, 0.2))                              import splitfolders
+
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
+
+from PIL import ImageFile
+
+ImageFile.LOAD_TRUNCATED_IMAGES - True
+
+from tensorflow.keras.applications.vgg19 import VGG19, preprocess_input
+
+from tensorflow.keras.layers import Flatten, Dense
+
+from tensorflow.keras.models import Model
+
+from tensorflow.keras.models import load_model
+
+from tensorflow.keras.preprocessing import image
+
+import numpy as np
+
+import matplotlib.pyplot as plt
+
+import matplotlib.image as mpimg
+
+%matplotlib inline                                                                                                                          from tensorflow.keras.preprocessing.image import ImageDataGenerator
+
+train_datagen = ImageDataGenerator (rescale = 1./255,shear_range = 0.2, zoom_range = 0.2, horizontal_flip = True)
+
+test_datagen = ImageDataGenerator(rescale = 1./255)                                                                         training_set =train_datagen.flow_from_directory('/content/output/train',target_size=(224, 224),batch_size = 64, class_mode='categorical')
+
+test_set = test_datagen.flow_from_directory('/content/output/val', target_size=(224, 224), batch_size=64, class_mode='categorical')                                                                                          IMAGE_SIZE = (224, 224)  # Standard input size for VGG19                                                                   from tensorflow.keras.applications import VGG19
+
+IMAGE_SIZE = (224, 224)  # Define image size
+VGG19_model = VGG19(input_shape=IMAGE_SIZE + (3,), weights='imagenet', include_top=False)
+# Import necessary libraries
+from tensorflow.keras.applications import VGG19
+from tensorflow.keras.layers import Flatten, Dense
+from tensorflow.keras.models import Model
+
+# Define image size
+IMAGE_SIZE = (224, 224)
+
+# Load the VGG19 model without the top layers
+VGG19_model = VGG19(input_shape=IMAGE_SIZE + (3,), weights='imagenet', include_top=False)
+
+# Freeze all layers in VGG19
+for layer in VGG19_model.layers:
+    layer.trainable = False
+
+# Add custom layers
+x = Flatten()(VGG19_model.output)
+prediction = Dense(4, activation='softmax')(x)  # Assuming 4 classes
+
+# Define the final model
+model = Model(inputs=VGG19_model.input, outputs=prediction)
+
+# Print model summary to verify
+model.summary()                                                                                                                                     model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])                              r=model.fit(
+training_set,
+validation_data=test_set,
+epochs=10,
+steps_per_epoch=len(training_set),
+validation_steps=len(test_set)
+)                                                                                                                                                                from tensorflow.keras.preprocessing import image
+import numpy as np
+
+img = image.load_img("/content/output/val/normal/2372_right.jpg", target_size=(224, 224))  # loading of the image
+
+x = image.img_to_array(img)  # image to array
+x = np.expand_dims(x, axis=0)  # changing the shape  # Corrected axis to 0
+preds = model.predict(x)  # Corrected variable name to preds
+pred = np.argmax(preds, axis=-1)  # Corrected variable name to pred and axis to -1
+index = ['cataract', 'diabetic_retinopathy', 'glaucoma', 'normal']
+result = str(index[pred[0]])  # Assuming you want to access the first element of pred
+print(result)  # Added print statement to display the result                                                                                                 model.save('evgg.h5') # Changed evgg to 'evgg' to specify the file name as a string                                                analyze eac and every block of code
